@@ -1,3 +1,4 @@
+import Hero from "~/components/Hero";
 import type { Route } from "./+types/index";
 
 export function meta({}: Route.MetaArgs) {
@@ -8,13 +9,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-    const now = new Date().toISOString();
-
-    if (typeof window === "undefined"){
-        console.log("Server Render At: ", now);
-    }else {
-        console.log("Client Hydration At: ", now);
-    }
-
-    return <section>My App</section>;
+    return <section>
+        <Hero name="ko"/>
+    </section>;
 }
