@@ -1,5 +1,6 @@
 import type {Project} from "~/types";
 import {Link} from 'react-router';
+import {format} from "date-fns";
 
 const ProjectCard = ({project}:{project: Project}) => {
     return (
@@ -18,7 +19,7 @@ const ProjectCard = ({project}:{project: Project}) => {
                     </p>
                     <div className="flex justify-between items-center text-sm text-gray-400">
                         <span>{project.category}</span>
-                        <span>{new Date(project.date).toLocaleString()}</span>
+                        <span>{format(new Date(project.date), 'MMM d, yyyy')}</span>
                     </div>
                 </div>
             </div>
