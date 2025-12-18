@@ -13,22 +13,44 @@ export async function loader({request}: Route.LoaderArgs): Promise<{ projects: P
 }
 
 const ProjectsPage = ({loaderData}: Route.ComponentProps) => {
-    const {projects} = loaderData as { projects: Project[] };
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [currentPage, setCurrentPage] = useState(1);
     const projectsPerPage = 10;
 
-    const [currentPage, setCurrentPage] = useState(1);
+    const {projects} = loaderData as { projects: Project[] };
 
-    const totalPages = Math.ceil(projects.length / projectsPerPage);
+    const categories = ["All", ...new Set(projects.map((project) => project.category))];
+
+    const filterProjects = selectedCategory === "All" ? projects : projects.filter(
+        (project) =>
+            project.category === selectedCategory
+    )
+
+    const totalPages = Math.ceil(filterProjects.length / projectsPerPage);
 
     const indexOfLast = currentPage * projectsPerPage;
     const indexOfFirst = indexOfLast - projectsPerPage;
-    const currentProjects = projects.slice(indexOfFirst, indexOfLast);
+    const currentProjects = filterProjects.slice(indexOfFirst, indexOfLast);
 
     return (
         <>
             <h2 className="text-3xl text-white font-bold mb-8">
                 Projects
             </h2>
+            <div className="flex flex-wrap gap-2 mb-8">
+                {
+                    categories.map((category) => (
+                        <button key={category} onClick={() => {
+                            setSelectedCategory(category);
+                            setCurrentPage(1);
+                        }}
+                                className={`px-3 py-1 rounded text-sm cursor-pointer ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200'}`}
+                        >
+                            {category}
+                        </button>
+                    ))
+                }
+            </div>
             <div className="grid gap-6 sm:grid-cols-2">
                 {currentProjects.map((project) => (
                    <ProjectCard project={project} key={project.id}/>
