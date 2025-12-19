@@ -7,7 +7,7 @@ type FeaturedProjectsProps = {
 }
 
 const FeaturedProjects = ({projects, count = 4}: FeaturedProjectsProps) => {
-    const featured = projects.filter((project) => project.featured).slice(0, count);
+    const featured = projects.filter((project) => project.feature).slice(0, count);
     console.log(featured)
 
     return (
