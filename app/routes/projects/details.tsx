@@ -1,31 +1,43 @@
-import type {Project} from "~/types";
+import type {Project, StrapiProject, StrapiResponse} from "~/types";
 import type {Route} from "./+types/details";
 import {FaArrowLeft} from "react-icons/fa";
 import {Link} from "react-router";
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 
+export async function loader({request, params}: Route.LoaderArgs) {
+    const {id} = params;
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/projects?filters[documentId][$eq]=${id}&populate=*`);
 
-export async function clientLoader({request, params}:Route.ClientLoaderArgs):Promise<Project>{
-   const res = await fetch(`${import.meta.env.VITE_API_URL}/projects/${params.id}`);
+    if (!res.ok) throw new Response("Project not found", {status: 404});
 
-   if(!res.ok) throw new Response("Project not found", { status: 404});
+    const json: StrapiResponse<StrapiProject> = await res.json();
 
-   const project: Project = await res.json();
-   return project;
+    const item = json.data[0];
+
+    const project: Project = {
+        id: item.id,
+        documentId: item.documentId,
+        title: item.title,
+        description: item.description,
+        image: item.image?.url
+            ? `${import.meta.env.VITE_STRAPI_URL}${item.image.url}`
+            : '/images/no-image.png',
+        url: item.url,
+        date: item.date,
+        category: item.category,
+        feature: item.feature
+    }
+
+    return {project};
 }
 
-export function HydrateFallback(){
-    return <div>Loading...</div>
-}
-
-const ProjectDetailsPage = ({loaderData}:Route.ComponentProps) => {
-    const project = loaderData;
-    console.log(project)
+const ProjectDetailsPage = ({loaderData}: Route.ComponentProps) => {
+    const { project } = loaderData;
 
     return (
         <>
             <Link to="/projects" className="flex items-center text-blue-400 hover:text-blue-500 mb-6 transition">
-               <FaArrowLeft className="mr-2"/> Back To Projects
+                <FaArrowLeft className="mr-2"/> Back To Projects
             </Link>
             <div className="grid gap-8 items-start md:grid-cols-2">
                 <div>
